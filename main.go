@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -44,7 +45,9 @@ func getUser(response http.ResponseWriter, request *http.Request) {
 func addUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
 	user := User{}
-	_ = json.NewDecoder(request.Body).Decode(&user)
+	if err := json.NewDecoder(request.Body).Decode(&user); err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("%+v\n", user)
 	users = append(users, user)
 	json.NewEncoder(response).Encode(user)
@@ -52,7 +55,19 @@ func addUser(response http.ResponseWriter, request *http.Request) {
 
 func updateUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
-	// todo
+	newUser := User{}
+	if err := json.NewDecoder(request.Body).Decode(&newUser); err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%+v\n", newUser)
+	params := mux.Vars(request)
+	for index, user := range users {
+		if user.ID == params["id"] {
+			users = append(users[:index], users[index + 1: ]...)
+			users = append(users, newUser)
+			return
+		}
+	}
 }
 
 func deleteUser(response http.ResponseWriter, request *http.Request) {
