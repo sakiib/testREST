@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
+	"github.com/joho/godotenv"
 )
 
 // User struct
@@ -27,13 +29,61 @@ func initUsers() {
 	}
 }
 
+// Credentials struct
+type Credentials struct {
+	Username string
+	Password string
+}
+
+var authentication Credentials
+
+func initAuth() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+		return
+	}
+
+	authentication.Username = os.Getenv("Username")
+	authentication.Password = os.Getenv("Password")
+	fmt.Println("Username: ", authentication.Username, "Password: ", authentication.Password)
+}
+
+func checkBasicAuthentication(currentUsername string, currentPassword string, isAuthenticated bool) bool {
+	if !isAuthenticated {
+		fmt.Println("No Authentication credentials! Username or Password provided!")
+		return false
+	}
+
+	if authentication.Username != currentUsername || authentication.Password != currentPassword {
+		fmt.Println("Wrong Username or Password! Not Authenticated!")
+		return false
+	}
+	return true
+}
+
 func getUsers(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
+	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
+		fmt.Println("Authentication Failed!")
+		json.NewEncoder(response).Encode(User{})
+		return
+	}
+
+	fmt.Println("Authentication successful!")
 	json.NewEncoder(response).Encode(users)
 }
 
 func getUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
+
+	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
+		fmt.Println("Authentication Failed!")
+		json.NewEncoder(response).Encode(User{})
+		return
+	}
+	fmt.Println("Authentication successful!")
+
 	params := mux.Vars(request)
 	for _, user := range users {
 		if user.ID == params["id"] {
@@ -46,6 +96,14 @@ func getUser(response http.ResponseWriter, request *http.Request) {
 
 func addUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
+
+	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
+		fmt.Println("Authentication Failed!")
+		json.NewEncoder(response).Encode(User{})
+		return
+	}
+	fmt.Println("Authentication successful!")
+
 	user := User{}
 	if err := json.NewDecoder(request.Body).Decode(&user); err != nil {
 		log.Fatal(err)
@@ -57,6 +115,14 @@ func addUser(response http.ResponseWriter, request *http.Request) {
 
 func updateUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
+
+	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
+		fmt.Println("Authentication Failed!")
+		json.NewEncoder(response).Encode(User{})
+		return
+	}
+	fmt.Println("Authentication successful!")
+
 	newUser := User{}
 	if err := json.NewDecoder(request.Body).Decode(&newUser); err != nil {
 		log.Fatal(err)
@@ -75,6 +141,14 @@ func updateUser(response http.ResponseWriter, request *http.Request) {
 
 func deleteUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
+
+	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
+		fmt.Println("Authentication Failed!")
+		json.NewEncoder(response).Encode(User{})
+		return
+	}
+	fmt.Println("Authentication successful!")
+
 	params := mux.Vars(request)
 	for index, user := range users {
 		if user.ID == params["id"] {
@@ -95,7 +169,10 @@ func handleRoutes(router *mux.Router) {
 
 func main() {
 	fmt.Println("testing REST API!")
+
 	initUsers()
+	initAuth()
+
 	router := mux.NewRouter().StrictSlash(true)
 	handleRoutes(router)
 	log.Fatal(http.ListenAndServe(":8080", router))
