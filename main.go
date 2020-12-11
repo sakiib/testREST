@@ -72,7 +72,13 @@ func updateUser(response http.ResponseWriter, request *http.Request) {
 
 func deleteUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
-	// todo
+	params := mux.Vars(request)
+	for index, user := range users {
+		if user.ID == params["id"] {
+			users = append(users[: index], users[index + 1:]...)
+			return
+		}
+	}
 }
 
 func handleRoutes(router *mux.Router) {
