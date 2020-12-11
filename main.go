@@ -43,7 +43,11 @@ func getUser(response http.ResponseWriter, request *http.Request) {
 
 func addUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
-	// todo
+	user := User{}
+	_ = json.NewDecoder(request.Body).Decode(&user)
+	fmt.Printf("%+v\n", user)
+	users = append(users, user)
+	json.NewEncoder(response).Encode(user)
 }
 
 func updateUser(response http.ResponseWriter, request *http.Request) {
