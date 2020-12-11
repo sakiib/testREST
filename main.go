@@ -93,6 +93,7 @@ func getUser(response http.ResponseWriter, request *http.Request) {
 			return
 		}
 	}
+	response.WriteHeader(http.StatusNoContent)
 	json.NewEncoder(response).Encode(User{})
 }
 
@@ -112,6 +113,11 @@ func addUser(response http.ResponseWriter, request *http.Request) {
 		log.Fatal(err)
 	}
 	fmt.Printf("%+v\n", user)
+	if user.ID == "" || user.FirstName == "" || user.LastName == "" {
+		response.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(response).Encode(User{})
+		return
+	}
 	users = append(users, user)
 	json.NewEncoder(response).Encode(users)
 }
