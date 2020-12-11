@@ -1,13 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
 )
 
 type User struct {
-	ID        int    `json:id`
+	ID        string `json:id`
 	FirstName string `json:firstname`
 	LastName  string `json:lastname`
 }
@@ -16,21 +17,28 @@ var users []User
 
 func initUsers() {
 	users = []User{
-		User{ID: 1, FirstName: "sakib", LastName: "alamin"},
-		User{ID: 2, FirstName: "prangon", LastName: "majumder"},
-		User{ID: 3, FirstName: "mehedi", LastName: "hasan"},
-		User{ID: 4, FirstName: "sahadat", LastName: "hossain"},
+		User{ID: "1", FirstName: "sakib", LastName: "alamin"},
+		User{ID: "2", FirstName: "prangon", LastName: "majumder"},
+		User{ID: "3", FirstName: "mehedi", LastName: "hasan"},
+		User{ID: "4", FirstName: "sahadat", LastName: "hossain"},
 	}
 }
 
 func getUsers(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
-	// todo
+	json.NewEncoder(response).Encode(users)
 }
 
 func getUser(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
-	// todo
+	params := mux.Vars(request)
+	for _, user := range users {
+		if user.ID == params["id"] {
+			json.NewEncoder(response).Encode(user)
+			return
+		}
+	}
+	json.NewEncoder(response).Encode(User{})
 }
 
 func addUser(response http.ResponseWriter, request *http.Request) {
