@@ -3,15 +3,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
+// User struct
 type User struct {
-	ID        string `json:id`
-	FirstName string `json:firstname`
-	LastName  string `json:lastname`
+	ID        string `json:"id"`
+	FirstName string `json:"firstname"`
+	LastName  string `json:"lastname"`
 }
 
 var users []User
