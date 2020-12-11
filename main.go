@@ -63,7 +63,7 @@ func updateUser(response http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 	for index, user := range users {
 		if user.ID == params["id"] {
-			users = append(users[:index], users[index + 1: ]...)
+			users = append(users[:index], users[index+1:]...)
 			users = append(users, newUser)
 			return
 		}
@@ -75,7 +75,7 @@ func deleteUser(response http.ResponseWriter, request *http.Request) {
 	params := mux.Vars(request)
 	for index, user := range users {
 		if user.ID == params["id"] {
-			users = append(users[: index], users[index + 1:]...)
+			users = append(users[:index], users[index+1:]...)
 			return
 		}
 	}
@@ -94,5 +94,5 @@ func main() {
 	initUsers()
 	router := mux.NewRouter().StrictSlash(true)
 	handleRoutes(router)
-	http.ListenAndServe(":8080", router)
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
