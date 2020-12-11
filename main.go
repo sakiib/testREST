@@ -50,7 +50,7 @@ func addUser(response http.ResponseWriter, request *http.Request) {
 	}
 	fmt.Printf("%+v\n", user)
 	users = append(users, user)
-	json.NewEncoder(response).Encode(user)
+	json.NewEncoder(response).Encode(users)
 }
 
 func updateUser(response http.ResponseWriter, request *http.Request) {
@@ -65,9 +65,10 @@ func updateUser(response http.ResponseWriter, request *http.Request) {
 		if user.ID == params["id"] {
 			users = append(users[:index], users[index+1:]...)
 			users = append(users, newUser)
-			return
+			break
 		}
 	}
+	json.NewEncoder(response).Encode(users)
 }
 
 func deleteUser(response http.ResponseWriter, request *http.Request) {
@@ -76,9 +77,10 @@ func deleteUser(response http.ResponseWriter, request *http.Request) {
 	for index, user := range users {
 		if user.ID == params["id"] {
 			users = append(users[:index], users[index+1:]...)
-			return
+			break
 		}
 	}
+	json.NewEncoder(response).Encode(users)
 }
 
 func handleRoutes(router *mux.Router) {
