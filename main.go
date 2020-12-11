@@ -66,6 +66,7 @@ func getUsers(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
 	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
 		fmt.Println("Authentication Failed!")
+		response.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(response).Encode(User{})
 		return
 	}
@@ -79,6 +80,7 @@ func getUser(response http.ResponseWriter, request *http.Request) {
 
 	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
 		fmt.Println("Authentication Failed!")
+		response.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(response).Encode(User{})
 		return
 	}
@@ -99,6 +101,7 @@ func addUser(response http.ResponseWriter, request *http.Request) {
 
 	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
 		fmt.Println("Authentication Failed!")
+		response.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(response).Encode(User{})
 		return
 	}
@@ -118,6 +121,7 @@ func updateUser(response http.ResponseWriter, request *http.Request) {
 
 	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
 		fmt.Println("Authentication Failed!")
+		response.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(response).Encode(User{})
 		return
 	}
@@ -144,6 +148,7 @@ func deleteUser(response http.ResponseWriter, request *http.Request) {
 
 	if authenticated := checkBasicAuthentication(request.BasicAuth()); !authenticated {
 		fmt.Println("Authentication Failed!")
+		response.WriteHeader(http.StatusUnauthorized)
 		json.NewEncoder(response).Encode(User{})
 		return
 	}
