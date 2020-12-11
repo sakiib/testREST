@@ -1,2 +1,5 @@
 # this is a comment! ignore this .idea/
 .idea/
+
+# dotenv should be in gitignore, but kept it intentionally outside
+# .env
